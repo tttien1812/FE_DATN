@@ -1,0 +1,143 @@
+.profile-container {
+  padding: 20px 40px;
+  background: #f9fafb;
+}
+
+.profile-card {
+  width: 100%;
+}
+
+/* ===== TOP LAYOUT NGANG ===== */
+.profile-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+/* ===== AVATAR ===== */
+.profile-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+
+  img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+  }
+
+  input {
+    margin-top: 10px;
+    font-size: 13px;
+  }
+}
+
+/* ===== INFO ===== */
+.profile-info {
+  flex: 1;
+
+  h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+}
+
+/* chia field dạng grid cho gọn */
+.profile-field {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: center;
+  margin-top: 12px;
+
+  label {
+    font-weight: 500;
+    color: #555;
+  }
+
+  span {
+    font-weight: 400;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: 0.2s;
+
+    &:focus {
+      border-color: #3498db;
+    }
+  }
+}
+
+/* ===== ACTIONS (bên phải) ===== */
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 120px;
+
+  .btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+
+  .edit {
+    background: #3498db;
+    color: #fff;
+
+    &:hover {
+      background: #2980b9;
+    }
+  }
+
+  .save {
+    background: #2ecc71;
+    color: #fff;
+
+    &:hover {
+      background: #27ae60;
+    }
+  }
+
+  .cancel {
+    background: #e74c3c;
+    color: #fff;
+
+    &:hover {
+      background: #c0392b;
+    }
+  }
+}
+
+/* ===== BOTTOM ===== */
+.profile-bottom {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  color: #888;
+  font-size: 14px;
+}
+
+/* ===== LOADING ===== */
+.profile-loading {
+  padding: 40px;
+  text-align: center;
+  font-size: 16px;
+}

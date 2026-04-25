@@ -1,0 +1,304 @@
+$primary: #3b82f6;
+$bg: #f8fafc;
+$white: #ffffff;
+$border: #e2e8f0;
+
+.admin-dashboard-container {
+  padding: 1.5rem;
+  background: $bg;
+
+  // --- PHẦN KPI TỔNG QUAN (FIX LỖI UI) ---
+  .section-kpi {
+    margin-bottom: 1.5rem;
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); // Chia làm 4 cột đều nhau
+      gap: 1.25rem;
+
+      .kpi-card {
+        background: $white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border: 1px solid $border;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+        // Định nghĩa màu cho các icon tròn bên trái
+        .icon {
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.2rem;
+
+          &.blue {
+            background: #eff6ff;
+            color: #3b82f6;
+          }
+          &.green {
+            background: #f0fdf4;
+            color: #10b981;
+          }
+          &.red {
+            background: #fef2f2;
+            color: #ef4444;
+          }
+          &.gold {
+            background: #fffbeb;
+            color: #f59e0b;
+          }
+        }
+
+        .info {
+          p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+          }
+          h2 {
+            margin: 4px 0 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+          }
+
+          .sub-text {
+            font-size: 0.7rem;
+            color: #94a3b8;
+          }
+          .user-name-highlight {
+            font-size: 1rem;
+            color: #3b82f6;
+          }
+        }
+
+        // Card đặc biệt cho top user
+        &.highlight {
+          background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+          border-color: #fde68a;
+        }
+      }
+    }
+  }
+
+  .dashboard-main-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr 300px; // Chia 3 cột: List - Detail - Insights
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+
+    section {
+      background: $white;
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid $border;
+
+      h3 {
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: #475569;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+
+  // Bảng xếp hạng bên trái
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    th {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid $border;
+    }
+    td {
+      padding: 10px 8px;
+      font-size: 0.8rem;
+      border-bottom: 1px solid #f8fafc;
+      cursor: pointer;
+    }
+    .active-row {
+      background: #eff6ff;
+      td {
+        color: $primary;
+        font-weight: 600;
+      }
+    }
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      img {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  // Khối Chi tiết User ở giữa
+  .section-user-detail {
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      .avatar-large {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        object-fit: cover;
+      }
+      h4 {
+        margin: 0;
+        font-size: 0.95rem;
+      }
+      p {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #64748b;
+      }
+    }
+
+    .detail-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 1.5rem;
+      .mini-card {
+        background: #f1f5f9;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        p {
+          font-size: 0.65rem;
+          color: #64748b;
+          margin: 0;
+        }
+        h4 {
+          margin: 4px 0;
+          font-size: 1rem;
+        }
+        .up {
+          color: #10b981;
+          font-size: 0.7rem;
+        }
+        .down {
+          color: #ef4444;
+          font-size: 0.7rem;
+        }
+      }
+    }
+
+    .speaker-analysis {
+      margin-top: 1.5rem;
+      h5 {
+        font-size: 0.8rem;
+        margin-bottom: 0.75rem;
+        color: #1e293b;
+      }
+      .speaker-table {
+        width: 100%;
+        font-size: 0.75rem;
+        th {
+          text-align: left;
+          padding: 6px;
+          color: #94a3b8;
+        }
+        td {
+          padding: 8px 6px;
+          border-bottom: 1px solid #f1f5f9;
+        }
+        .score-tag {
+          background: #dbeafe;
+          color: #1e40af;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  // Cột phải: Sentiment & Issues
+  .right-column-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    .sentiment-stats {
+      display: flex;
+      gap: 10px;
+      .stat-item {
+        flex: 1;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        &.neg {
+          background: #fef2f2;
+          h2 {
+            color: #dc2626;
+          }
+        }
+        &.pos {
+          background: #f0fdf4;
+          h2 {
+            color: #16a34a;
+          }
+        }
+        h2 {
+          margin: 0;
+          font-size: 1.25rem;
+        }
+        p {
+          margin: 5px 0 0;
+          font-size: 0.7rem;
+          color: #64748b;
+        }
+      }
+    }
+    .issue-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      span {
+        font-size: 0.8rem;
+        color: #475569;
+      }
+      strong {
+        color: #1e293b;
+      }
+    }
+    .drill-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      button {
+        border: 1px solid $border;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: left;
+        font-size: 0.8rem;
+        cursor: pointer;
+        &:hover {
+          background: #f8fafc;
+          border-color: $primary;
+          color: $primary;
+        }
+        i {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}

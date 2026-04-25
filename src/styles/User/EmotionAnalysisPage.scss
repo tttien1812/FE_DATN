@@ -1,0 +1,223 @@
+.emotion_page_container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.emotion_page_title {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+/* UPLOAD */
+.emotion_upload_box {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.emotion_upload_button {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.emotion_upload_button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* AUDIO */
+.emotion_audio_preview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* LOADING */
+.emotion_loading {
+  text-align: center;
+  margin: 20px 0;
+  color: #6b7280;
+}
+
+/* RESULT */
+.emotion_result {
+  display: grid;
+  gap: 20px;
+}
+
+/* CARD */
+.emotion_card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+/* SENTIMENT COLOR */
+.emotion_positive {
+  border-left: 6px solid #22c55e;
+}
+
+.emotion_negative {
+  border-left: 6px solid #ef4444;
+}
+
+.emotion_neutral {
+  border-left: 6px solid #6b7280;
+}
+
+/* PROGRESS */
+.emotion_progress {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.emotion_progress_bar {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+/* BREAKDOWN */
+.emotion_breakdown {
+  margin-top: 15px;
+}
+
+.emotion_item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.emotion_label {
+  width: 120px;
+}
+
+.emotion_bar {
+  flex: 1;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.emotion_fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+}
+
+.emotion_percent {
+  width: 40px;
+  text-align: right;
+}
+
+/* HISTORY */
+.emotion_history {
+  margin-top: 30px;
+}
+
+.emotion_history_item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.emotion_history_item:hover {
+  background: #eef2ff;
+}
+
+.emotion_history_text {
+  max-width: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion_history_badge {
+  background: #e0e7ff;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.chat_container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.chat_message {
+  display: flex;
+  width: 100%;
+}
+
+.chat_message.left {
+  justify-content: flex-start;
+}
+
+.chat_message.right {
+  justify-content: flex-end;
+}
+
+.chat_bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f1f1f1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chat_message.right .chat_bubble {
+  background: #4cafef;
+  color: white;
+}
+
+.chat_meta {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.chat_text {
+  font-size: 14px;
+  line-height: 1.4;
+}
+.speaker_analysis_container {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.speaker_card {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f5f5f5;
+}
+.up {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.down {
+  color: #ff4d4f;
+  font-weight: 500;
+}

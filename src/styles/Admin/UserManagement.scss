@@ -1,0 +1,292 @@
+.admin-page {
+  width: 100%;
+  padding: 24px 32px;
+  background: #f5f6fa;
+}
+
+.admin-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+
+  i {
+    margin-right: 8px;
+    color: #0d6efd;
+  }
+}
+
+.admin-form-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.admin-input,
+.admin-select {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+}
+
+.admin-form-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+.admin-table-card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background: #f1f3f5;
+    text-align: left;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #333;
+  }
+}
+
+.btn {
+  margin: 8px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+
+  &.btn-create {
+    background: #2563eb;
+    color: #fff;
+  }
+
+  &.btn-update {
+    background: #16a34a;
+    color: #fff;
+  }
+
+  &.btn-reset {
+    background: #e5e7eb;
+  }
+}
+
+.role-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+
+  &.admin {
+    background: #ffe3e3;
+    color: #c92a2a;
+  }
+
+  &.user {
+    background: #e7f5ff;
+    color: #1c7ed6;
+  }
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+
+  &.active {
+    background: #d3f9d8;
+    color: #2b8a3e;
+  }
+
+  &.inactive {
+    background: #ffe3e3;
+    color: #c92a2a;
+  }
+}
+
+.admin-actions {
+  display: flex;
+  gap: 12px;
+  font-size: 18px;
+
+  .action-edit {
+    color: #0d6efd;
+    cursor: pointer;
+  }
+
+  .action-delete {
+    color: #fa5252;
+    cursor: pointer;
+  }
+}
+
+/* =========================
+   MODAL OVERLAY
+========================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.25s ease;
+}
+
+/* =========================
+   MODAL CARD
+========================= */
+.modal-card {
+  width: 520px;
+  max-width: calc(100% - 32px);
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.3s ease;
+}
+
+/* =========================
+   MODAL TITLE
+========================= */
+.modal-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* =========================
+   FORM GRID (reuse admin)
+========================= */
+.modal-card {
+  .admin-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .admin-input,
+  .admin-select {
+    height: 44px;
+    border-radius: 10px;
+    padding: 0 14px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+    outline: none;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #3b82f6;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+  }
+}
+
+/* =========================
+   MODAL ACTIONS
+========================= */
+.modal-card {
+  .admin-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    .btn {
+      min-width: 100px;
+      height: 42px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+
+      &:hover {
+        background: #1d4ed8;
+      }
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: none;
+
+      &:hover {
+        background: #e5e7eb;
+      }
+    }
+  }
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 640px) {
+  .modal-card {
+    padding: 20px;
+
+    .admin-form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
