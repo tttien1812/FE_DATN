@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  getSummaryApi,
-  getGroupByDateApi,
-  getSentimentDistributionApi,
+  getDashboardDailyApi,
   getMonthlyKpiApi,
   getInsightApi,
 } from "../../services/dashboardService";
@@ -28,9 +26,7 @@ import worstDayIcon from "../../assets/warning.png";
 import "../../styles/User/DashboardPage.scss";
 
 function DashboardPage() {
-  const [summary, setSummary] = useState([]);
-  const [details, setDetails] = useState({});
-  const [sentimentData, setSentimentData] = useState([]);
+  const [dailyData, setDailyData] = useState([]);
   const [kpi, setKpi] = useState(null);
   const [insights, setInsights] = useState([]);
 
@@ -47,19 +43,13 @@ function DashboardPage() {
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const [summaryRes, groupRes, sentimentRes, kpiRes, insightRes] =
-        await Promise.all([
-          getSummaryApi(userId),
-          getGroupByDateApi(userId),
-          getSentimentDistributionApi(userId),
-          getMonthlyKpiApi(userId),
-          getInsightApi(userId),
-        ]);
+      const [dailyRes, kpiRes, insightRes] = await Promise.all([
+        getDashboardDailyApi(userId),
+        getMonthlyKpiApi(userId),
+        getInsightApi(userId),
+      ]);
 
-      if (summaryRes.data.errCode === 0) setSummary(summaryRes.data.data);
-      if (groupRes.data.errCode === 0) setDetails(groupRes.data.data);
-      if (sentimentRes.data.errCode === 0)
-        setSentimentData(sentimentRes.data.data);
+      if (dailyRes.data.errCode === 0) setDailyData(dailyRes.data.data);
       if (kpiRes.data.errCode === 0) setKpi(kpiRes.data.data);
       if (insightRes.data.errCode === 0) setInsights(insightRes.data.data);
     } catch (e) {
@@ -69,10 +59,10 @@ function DashboardPage() {
     }
   };
 
-  const filteredData = summary.slice(-Number(range));
-  const filteredSentiment = sentimentData.slice(-Number(range));
+  // const filteredData = summary.slice(-Number(range));
+  const filteredData = [...dailyData].slice(-Number(range));
 
-  const sentimentPercentData = filteredSentiment.map((item) => {
+  const sentimentPercentData = filteredData.map((item) => {
     const total =
       item.veryNegativeCount +
         item.negativeCount +
@@ -292,33 +282,39 @@ function DashboardPage() {
           </div>
         </div>
 
-        {/* Chart 2: Số lượng */}
         <div className="chart-item">
-          <h3 className="chart-title">📊 Số lượng cuộc hội thoại</h3>
+          <h3 className="chart-title">🧑‍💼 Cảm xúc Customer</h3>
+
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={filteredData}>
+              <LineChart data={filteredData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
                   stroke="#f0f0f0"
                 />
+
                 <XAxis
                   dataKey="date"
                   tickFormatter={formatXAxis}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip content={<CustomTooltip />} />
+
+                <YAxis domain={[0, 1]} tick={{ fontSize: 12 }} />
+
+                <Tooltip />
+
                 <Legend verticalAlign="top" height={36} />
-                <Bar
-                  name="Số lượng cuộc hội thoại"
-                  dataKey="totalRecords"
-                  fill="#1254d8"
-                  radius={[4, 4, 0, 0]}
-                  barSize={20}
+
+                <Line
+                  name="Customer Score"
+                  type="monotone"
+                  dataKey="customerScore"
+                  stroke="#fa8c16"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
                 />
-              </BarChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -376,7 +372,7 @@ function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {summary.map((item) => (
+                {dailyData.map((item) => (
                   <tr
                     key={item.date}
                     onClick={() => setSelectedDate(item.date)}

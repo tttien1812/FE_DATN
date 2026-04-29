@@ -264,7 +264,7 @@ function AdminDashboardPage() {
                   <tbody>
                     {userDetail.speaker.map((s, i) => (
                       <tr key={i}>
-                        <td>{s.speaker}</td>
+                        <td>{s.role}</td>
                         <td>
                           <span className="score-tag">
                             {s.avgScore.toFixed(2)}
