@@ -1,18 +1,29 @@
 import axios from "./axios"; // instance của bạn
 
-export const getDashboardDailyApi = (userId) => {
-  return axios.get(`/api/dashboard-daily?userId=${userId}`);
-};
-
-export const getMonthlyKpiApi = (userId) => {
-  return axios.get("/api/monthly-kpi", {
-    params: { userId },
+export const getDashboardDailyApi = (userId, month) => {
+  return axios.get(`/api/dashboard-daily`, {
+    params: {
+      userId,
+      month,
+    },
   });
 };
 
-export const getInsightApi = (userId) => {
+export const getMonthlyKpiApi = (userId, month) => {
+  return axios.get("/api/monthly-kpi", {
+    params: {
+      userId,
+      month,
+    },
+  });
+};
+
+export const getInsightApi = (userId, month) => {
   return axios.get(`/api/insight`, {
-    params: { userId },
+    params: {
+      userId,
+      month,
+    },
   });
 };
 

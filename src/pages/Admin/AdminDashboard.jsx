@@ -23,13 +23,19 @@ function AdminDashboardPage() {
 
   const [sortBy, setSortBy] = useState("totalConversations");
   const [order, setOrder] = useState("DESC");
-  const [month, setMonth] = useState("");
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
 
   const UPLOAD_URL = "http://localhost:3000/uploads";
 
   useEffect(() => {
     fetchData();
   }, [sortBy, order, month]);
+
+  useEffect(() => {
+    if (selectedUser) {
+      fetchUserDetail(selectedUser);
+    }
+  }, [month, selectedUser]);
 
   const fetchData = async () => {
     try {
@@ -45,12 +51,16 @@ function AdminDashboardPage() {
 
   const fetchUserDetail = async (userId) => {
     try {
-      setSelectedUser(userId);
+      // setSelectedUser(userId);
       const res = await getAdminUserDetailApi({
         userId,
         month: month || data?.filter?.month,
       });
-      if (res.data.errCode === 0) setUserDetail(res.data.data);
+      if (res.data.errCode === 0) {
+        setUserDetail(res.data.data);
+      } else {
+        setUserDetail(null);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -61,6 +71,21 @@ function AdminDashboardPage() {
 
   return (
     <div className="admin-dashboard-container">
+      <header className="dashboard-header">
+        <div className="header-title">
+          <h1>Dashboard Toàn Hệ Thống</h1>
+          <p>Theo dõi và phân tích hiệu suất cuộc gọi của nhân viên</p>
+        </div>
+
+        <div className="dashboard-filter">
+          <label>Chọn tháng:</label>
+          <input
+            type="month"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+          />
+        </div>
+      </header>
       {/* (1) KPI TỔNG QUAN */}
       <section className="section-kpi">
         <div className="kpi-grid">
@@ -69,7 +94,7 @@ function AdminDashboardPage() {
               <i className="bi bi-mic-fill"></i>
             </div>
             <div className="info">
-              <p>Tổng số audio</p>
+              <p>Tổng cuộc gọi đã phân tích</p>
               <h2>{data.totalSystem.totalAudio?.toLocaleString()}</h2>
             </div>
           </div>
@@ -78,7 +103,7 @@ function AdminDashboardPage() {
               <i className="bi bi-star-fill"></i>
             </div>
             <div className="info">
-              <p>Avg Score hệ thống</p>
+              <p>Điểm cảm xúc trung bình</p>
               <h2>{Number(data.totalSystem.avgScore).toFixed(2)}/1</h2>
             </div>
           </div>
@@ -87,8 +112,8 @@ function AdminDashboardPage() {
               <i className="bi bi-emoji-frown-fill"></i>
             </div>
             <div className="info">
-              <p>Tỷ lệ negative</p>
-              <h2>{data.totalSystem.totalNegative}%</h2>
+              <p>Tỷ lệ cuộc gọi tiêu cực</p>
+              <h2>{(data.totalSystem.negativeRate * 100).toFixed(1)}%</h2>
             </div>
           </div>
           <div className="kpi-card highlight">
@@ -96,7 +121,7 @@ function AdminDashboardPage() {
               <i className="bi bi-trophy-fill"></i>
             </div>
             <div className="info">
-              <p>User điểm cao nhất</p>
+              <p>Nhân viên có điểm cao nhất</p>
               <h2 className="user-name-highlight">
                 {data.top.topScore[0]?.User?.fullName}
               </h2>
@@ -112,7 +137,7 @@ function AdminDashboardPage() {
         {/* (2) BẢNG XẾP HẠNG */}
         <section className="section-table">
           <div className="card-header">
-            <h3>BẢNG XẾP HẠNG</h3>
+            <h3>BẢNG XẾP HẠNG NHÂN VIÊN</h3>
           </div>
           <div className="table-wrapper">
             <table className="custom-table">
@@ -120,15 +145,15 @@ function AdminDashboardPage() {
                 <tr>
                   <th>#</th>
                   <th>Nhân viên</th>
-                  <th>Avg</th>
-                  <th>Neg%</th>
+                  <th>Điểm TB</th>
+                  <th>Tỷ lệ tiêu cực</th>
                 </tr>
               </thead>
               <tbody>
                 {data.users.map((u, i) => (
                   <tr
                     key={u.userId}
-                    onClick={() => fetchUserDetail(u.userId)}
+                    onClick={() => setSelectedUser(u.userId)}
                     className={selectedUser === u.userId ? "active-row" : ""}
                   >
                     <td>{i + 1}</td>
@@ -148,10 +173,10 @@ function AdminDashboardPage() {
                     </td>
                     <td
                       className={
-                        +u.negativeRate > 20 ? "text-danger" : "text-success"
+                        +u.negativeRate > 0.2 ? "text-danger" : "text-success"
                       }
                     >
-                      {u.negativeRate}%
+                      {(u.negativeRate * 100).toFixed(1)}%
                     </td>
                   </tr>
                 ))}
@@ -163,10 +188,12 @@ function AdminDashboardPage() {
         {/* (3) CHI TIẾT USER - PHẦN BẠN CẦN ĐÃ QUAY LẠI */}
         <section className="section-user-detail">
           <div className="card-header">
-            <h3>CHI TIẾT NHÂN VIÊN</h3>
+            <h3>PHÂN TÍCH NHÂN VIÊN</h3>
           </div>
           {!userDetail ? (
-            <div className="empty-state">👉 Chọn nhân viên để xem chi tiết</div>
+            <div className="empty-state">
+              👉 Chọn nhân viên để xem phân tích chi tiết
+            </div>
           ) : (
             <div className="user-detail-content">
               <div className="profile-header">
@@ -187,11 +214,11 @@ function AdminDashboardPage() {
 
               <div className="detail-kpi-grid">
                 <div className="mini-card">
-                  <p>Audio</p>
+                  <p>Số lượng cuộc gọi</p>
                   <h4>{userDetail.kpi.totalAudio}</h4>
                 </div>
                 <div className="mini-card">
-                  <p>Avg Score</p>
+                  <p>Điểm trung bình</p>
                   <h4>{userDetail.kpi.avgScore}</h4>
                   <span
                     className={
@@ -199,11 +226,11 @@ function AdminDashboardPage() {
                     }
                   >
                     {userDetail.comparison.scoreDiff >= 0 ? "↑" : "↓"}{" "}
-                    {Math.abs(userDetail.comparison.scoreDiff)}
+                    {Math.abs(userDetail.comparison.scoreDiff)} so với hệ thống
                   </span>
                 </div>
                 <div className="mini-card">
-                  <p>Negative</p>
+                  <p>Tỷ lệ cuộc gọi tiêu cực</p>
                   <h4>{(userDetail.kpi.negativeRate * 100).toFixed(1)}%</h4>
                 </div>
               </div>
@@ -237,14 +264,14 @@ function AdminDashboardPage() {
                       stroke="#3b82f6"
                       strokeWidth={3}
                       dot={{ r: 4 }}
-                      name="User"
+                      name="Nhân viên"
                     />
                     <Line
                       type="monotone"
                       dataKey="systemScore"
                       stroke="#cbd5e1"
                       strokeDasharray="5 5"
-                      name="Hệ thống"
+                      name="Trung bình hệ thống"
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -252,13 +279,12 @@ function AdminDashboardPage() {
 
               {/* BẢNG SPEAKER PHÂN TÍCH */}
               <div className="speaker-analysis">
-                <h5>Phân tích Speaker</h5>
+                <h5>Điểm cảm xúc theo vai trò</h5>
                 <table className="speaker-table">
                   <thead>
                     <tr>
-                      <th>Speaker</th>
-                      <th>Score</th>
-                      <th>Negative</th>
+                      <th>Vai trò</th>
+                      <th>Điểm</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -270,7 +296,6 @@ function AdminDashboardPage() {
                             {s.avgScore.toFixed(2)}
                           </span>
                         </td>
-                        <td>{(s.negativeRate * 100).toFixed(1)}%</td>
                       </tr>
                     ))}
                   </tbody>

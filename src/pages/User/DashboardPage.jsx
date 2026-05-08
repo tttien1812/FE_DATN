@@ -29,7 +29,7 @@ function DashboardPage() {
   const [dailyData, setDailyData] = useState([]);
   const [kpi, setKpi] = useState(null);
   const [insights, setInsights] = useState([]);
-
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedDate, setSelectedDate] = useState(null);
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState("7");
@@ -38,15 +38,15 @@ function DashboardPage() {
 
   useEffect(() => {
     fetchDashboard();
-  }, [userId]);
+  }, [userId, month]);
 
   const fetchDashboard = async () => {
     try {
       setLoading(true);
       const [dailyRes, kpiRes, insightRes] = await Promise.all([
-        getDashboardDailyApi(userId),
-        getMonthlyKpiApi(userId),
-        getInsightApi(userId),
+        getDashboardDailyApi(userId, month),
+        getMonthlyKpiApi(userId, month),
+        getInsightApi(userId, month),
       ]);
 
       if (dailyRes.data.errCode === 0) setDailyData(dailyRes.data.data);
@@ -59,8 +59,24 @@ function DashboardPage() {
     }
   };
 
+  const isSameMonth = (dateStr, selectedMonth) => {
+    if (!dateStr || !selectedMonth) return false;
+
+    return dateStr.slice(0, 7) === selectedMonth;
+  };
+
   // const filteredData = summary.slice(-Number(range));
-  const filteredData = [...dailyData].slice(-Number(range));
+  // const filteredData = [...dailyData].slice(-Number(range));
+  const monthData = dailyData.filter((item) => isSameMonth(item.date, month));
+
+  let filteredData = [...monthData];
+
+  if (range === "1") {
+    // 🔥 chỉ lấy ngày mới nhất trong tháng
+    filteredData = monthData.slice(-1);
+  } else {
+    filteredData = monthData.slice(-Number(range));
+  }
 
   const sentimentPercentData = filteredData.map((item) => {
     const total =
@@ -192,6 +208,13 @@ function DashboardPage() {
                 {r === "1" ? "Hôm nay" : `${r} ngày`}
               </button>
             ))}
+          </div>
+          <div className="filter-row">
+            <input
+              type="month"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+            />
           </div>
         </div>
       </div>
@@ -372,7 +395,7 @@ function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {dailyData.map((item) => (
+                {filteredData.map((item) => (
                   <tr
                     key={item.date}
                     onClick={() => setSelectedDate(item.date)}
