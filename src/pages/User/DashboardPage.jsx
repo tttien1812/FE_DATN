@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import {
-  getSummaryApi,
-  getGroupByDateApi,
-  getSentimentDistributionApi,
+  getDashboardDailyApi,
   getMonthlyKpiApi,
-  getInsightApi,
+  getUserInsightApi,
 } from "../../services/dashboardService";
 
 import {
@@ -28,12 +26,10 @@ import worstDayIcon from "../../assets/warning.png";
 import "../../styles/User/DashboardPage.scss";
 
 function DashboardPage() {
-  const [summary, setSummary] = useState([]);
-  const [details, setDetails] = useState({});
-  const [sentimentData, setSentimentData] = useState([]);
+  const [dailyData, setDailyData] = useState([]);
   const [kpi, setKpi] = useState(null);
   const [insights, setInsights] = useState([]);
-
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedDate, setSelectedDate] = useState(null);
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState("7");
@@ -42,24 +38,18 @@ function DashboardPage() {
 
   useEffect(() => {
     fetchDashboard();
-  }, [userId]);
+  }, [userId, month]);
 
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const [summaryRes, groupRes, sentimentRes, kpiRes, insightRes] =
-        await Promise.all([
-          getSummaryApi(userId),
-          getGroupByDateApi(userId),
-          getSentimentDistributionApi(userId),
-          getMonthlyKpiApi(userId),
-          getInsightApi(userId),
-        ]);
+      const [dailyRes, kpiRes, insightRes] = await Promise.all([
+        getDashboardDailyApi(userId, month),
+        getMonthlyKpiApi(userId, month),
+        getUserInsightApi(userId, month),
+      ]);
 
-      if (summaryRes.data.errCode === 0) setSummary(summaryRes.data.data);
-      if (groupRes.data.errCode === 0) setDetails(groupRes.data.data);
-      if (sentimentRes.data.errCode === 0)
-        setSentimentData(sentimentRes.data.data);
+      if (dailyRes.data.errCode === 0) setDailyData(dailyRes.data.data);
       if (kpiRes.data.errCode === 0) setKpi(kpiRes.data.data);
       if (insightRes.data.errCode === 0) setInsights(insightRes.data.data);
     } catch (e) {
@@ -69,10 +59,26 @@ function DashboardPage() {
     }
   };
 
-  const filteredData = summary.slice(-Number(range));
-  const filteredSentiment = sentimentData.slice(-Number(range));
+  const isSameMonth = (dateStr, selectedMonth) => {
+    if (!dateStr || !selectedMonth) return false;
 
-  const sentimentPercentData = filteredSentiment.map((item) => {
+    return dateStr.slice(0, 7) === selectedMonth;
+  };
+
+  // const filteredData = summary.slice(-Number(range));
+  // const filteredData = [...dailyData].slice(-Number(range));
+  const monthData = dailyData.filter((item) => isSameMonth(item.date, month));
+
+  let filteredData = [...monthData];
+
+  if (range === "1") {
+    // 🔥 chỉ lấy ngày mới nhất trong tháng
+    filteredData = monthData.slice(-1);
+  } else {
+    filteredData = monthData.slice(-Number(range));
+  }
+
+  const sentimentPercentData = filteredData.map((item) => {
     const total =
       item.veryNegativeCount +
         item.negativeCount +
@@ -106,19 +112,39 @@ function DashboardPage() {
     very_negative: "Rất tiêu cực",
   };
 
-  const renderInsightIcon = (type) => {
-    switch (type) {
-      case "good":
-        return <i className="bi bi-rocket-takeoff-fill"></i>;
-      case "danger":
-        return <i className="bi bi-exclamation-triangle-fill"></i>;
-      case "warning":
-        return <i className="bi bi-lightbulb-fill"></i>;
+  // const renderInsightIcon = (type) => {
+  //   switch (type) {
+  //     case "good":
+  //       return <i className="bi bi-rocket-takeoff-fill"></i>;
+  //     case "danger":
+  //       return <i className="bi bi-exclamation-triangle-fill"></i>;
+  //     case "warning":
+  //       return <i className="bi bi-lightbulb-fill"></i>;
+  //     default:
+  //       return <i className="bi bi-info-circle-fill"></i>;
+  //   }
+  // };
+
+  const renderInsightIcon = (item) => {
+    const group = item?.group;
+
+    switch (group) {
+      case "performance":
+        return <i className="bi bi-speedometer2 icon-performance"></i>;
+
+      case "customer":
+        return <i className="bi bi-emoji-smile-fill icon-customer"></i>;
+
+      case "staff":
+        return <i className="bi bi-person-badge-fill icon-staff"></i>;
+
+      case "risk":
+        return <i className="bi bi-shield-exclamation icon-risk"></i>;
+
       default:
-        return <i className="bi bi-info-circle-fill"></i>;
+        return <i className="bi bi-info-circle-fill icon-default"></i>;
     }
   };
-
   const activeKeys = sentimentKeys.filter((key) =>
     sentimentPercentData.some((item) => item[key] > 0),
   );
@@ -192,6 +218,13 @@ function DashboardPage() {
       <div className="dashboard-header">
         <div className="header-left">
           <h1 className="dashboard-title">Dashboard Tổng Quan</h1>
+          <p className="dashboard-subtitle">
+            Theo dõi xu hướng và phân bổ cảm xúc của khách hàng
+          </p>
+        </div>
+
+        <div className="header-right-filters">
+          {/* Khối nút chọn khoảng ngày (7 ngày, 30 ngày...) */}
           <div className="filter-group">
             {["1", "7", "30"].map((r) => (
               <button
@@ -202,6 +235,19 @@ function DashboardPage() {
                 {r === "1" ? "Hôm nay" : `${r} ngày`}
               </button>
             ))}
+          </div>
+
+          {/* Khối chọn tháng được làm gọn và đẹp lại */}
+          <div className="month-filter-box">
+            <span className="month-label">
+              <i className="bi bi-calendar3"></i> Tháng:
+            </span>
+            <input
+              type="month"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              className="month-input-clean"
+            />
           </div>
         </div>
       </div>
@@ -292,33 +338,39 @@ function DashboardPage() {
           </div>
         </div>
 
-        {/* Chart 2: Số lượng */}
         <div className="chart-item">
-          <h3 className="chart-title">📊 Số lượng cuộc hội thoại</h3>
+          <h3 className="chart-title">🧑‍💼 Cảm xúc Customer</h3>
+
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={filteredData}>
+              <LineChart data={filteredData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
                   stroke="#f0f0f0"
                 />
+
                 <XAxis
                   dataKey="date"
                   tickFormatter={formatXAxis}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip content={<CustomTooltip />} />
+
+                <YAxis domain={[0, 1]} tick={{ fontSize: 12 }} />
+
+                <Tooltip />
+
                 <Legend verticalAlign="top" height={36} />
-                <Bar
-                  name="Số lượng cuộc hội thoại"
-                  dataKey="totalRecords"
-                  fill="#1254d8"
-                  radius={[4, 4, 0, 0]}
-                  barSize={20}
+
+                <Line
+                  name="Customer Score"
+                  type="monotone"
+                  dataKey="customerScore"
+                  stroke="#fa8c16"
+                  strokeWidth={3}
+                  dot={{ r: 4 }}
                 />
-              </BarChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -376,7 +428,7 @@ function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {summary.map((item) => (
+                {filteredData.map((item) => (
                   <tr
                     key={item.date}
                     onClick={() => setSelectedDate(item.date)}
@@ -409,24 +461,44 @@ function DashboardPage() {
           <h3 className="section-title">💡 Insight & Phân tích</h3>
 
           <div className="table-wrapper">
-            {" "}
             {/* Tận dụng table-wrapper để có scroll */}
             <div className="insights-list">
               {!insights.length ? (
                 <div className="empty-state">
-                  Chưa có insight nào được ghi nhận
+                  <i className="bi bi-inbox-fill"></i>{" "}
+                  {/* Thêm icon cho trống trải */}
+                  <p>Chưa có insight nào được ghi nhận</p>
                 </div>
               ) : (
                 insights.map((item, index) => (
                   <div
                     key={index}
-                    className={`insight-item-modern ${item.type}`}
+                    className={`insight-item-modern ${item.type}`} // good, warning, danger
                   >
                     <div className="insight-icon">
-                      {renderInsightIcon(item.type)}
+                      {renderInsightIcon(item)}
                     </div>
+
                     <div className="insight-body">
+                      <div className="insight-header">
+                        <span className="insight-title">{item.title}</span>
+                        {item.metric && (
+                          <span className="insight-metric-tag">
+                            {item.metric}
+                          </span>
+                        )}
+                      </div>
+
                       <p className="insight-message">{item.message}</p>
+
+                      {item.action && (
+                        <div className="insight-action-box">
+                          <i className="bi bi-lightbulb"></i>
+                          <span>
+                            <strong>Gợi ý:</strong> {item.action}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))

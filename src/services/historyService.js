@@ -15,3 +15,8 @@ export const getHistoryByDate = (userId, date) => {
 export const getHistoryDetail = (id) => {
   return axios.get(`/api/history/${id}`);
 };
+export const getHistoryInsight = (conversationId, scope = "user") => {
+  return axios.get(`/api/history/${conversationId}/insights`, {
+    params: { scope },
+  });
+};

@@ -1,38 +1,38 @@
 import axios from "./axios"; // instance của bạn
 
-export const getSummaryApi = (userId, fromDate, toDate) => {
-  return axios.get("/api/summary", {
-    params: { userId, fromDate, toDate },
+export const getDashboardDailyApi = (userId, month) => {
+  return axios.get(`/api/dashboard-daily`, {
+    params: {
+      userId,
+      month,
+    },
   });
 };
 
-export const getDetailsApi = (userId, fromDate, toDate) => {
-  return axios.get("/api/details", {
-    params: { userId, fromDate, toDate },
-  });
-};
-
-export const getGroupByDateApi = (userId, fromDate, toDate) => {
-  return axios.get("/api/group-by-date", {
-    params: { userId, fromDate, toDate },
-  });
-};
-
-export const getSentimentDistributionApi = (userId) => {
-  return axios.get("/api/sentiment-distribution", {
-    params: { userId },
-  });
-};
-
-export const getMonthlyKpiApi = (userId) => {
+export const getMonthlyKpiApi = (userId, month) => {
   return axios.get("/api/monthly-kpi", {
-    params: { userId },
+    params: {
+      userId,
+      month,
+    },
   });
 };
 
-export const getInsightApi = (userId) => {
+export const getInsightApi = (userId, month) => {
   return axios.get(`/api/insight`, {
-    params: { userId },
+    params: {
+      userId,
+      month,
+    },
+  });
+};
+
+export const getUserInsightApi = (userId, month) => {
+  return axios.get(`/api/user-insight`, {
+    params: {
+      userId,
+      month,
+    },
   });
 };
 
@@ -43,4 +43,10 @@ export const getAdminDashboardApi = (params) => {
 
 export const getAdminUserDetailApi = (params) => {
   return axios.get("/api/admin-user-detail", { params });
+};
+
+export const getAdminInsightApi = (month) => {
+  return axios.get("/api/admin-insight", {
+    params: { month },
+  });
 };

@@ -5,6 +5,12 @@ $text-main: #1e293b;
 $text-sub: #64748b;
 $radius: 16px;
 $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+$bg-good: #f0fdf4;
+$border-good: #22c55e;
+$bg-warning: #fffbeb;
+$border-warning: #f59e0b;
+$bg-danger: #fef2f2;
+$border-danger: #ef4444;
 
 .dashboard-container {
   background-color: $bg-color;
@@ -12,6 +18,134 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   font-family: "Inter", sans-serif;
   color: $text-main;
   min-height: 100vh;
+
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0; // Đường gạch nhẹ phân cách với KPI phía dưới
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .dashboard-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+        color: #1e293b;
+      }
+
+      .dashboard-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin: 0;
+      }
+    }
+
+    // Gom cụm filter sang bên phải hàng ngang
+    .header-right-filters {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+  }
+
+  // Khối nút bấm chọn khoảng ngày (Hôm nay, 7 ngày, 30 ngày)
+  .filter-group {
+    display: flex;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #1e293b;
+      }
+
+      &.active {
+        background: #ffffff;
+        color: #4f46e5; // Sử dụng biến $primary của bạn
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+    }
+  }
+
+  // Ô chọn Tháng thiết kế mới ăn khớp hoàn toàn
+  .month-filter-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    height: 34px; // Khớp chiều cao với cụm filter-group bên cạnh
+    box-sizing: border-box;
+
+    .month-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      i {
+        color: #4f46e5; // Icon lịch màu tím/xanh chủ đạo
+      }
+    }
+
+    .month-input-clean {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      padding: 0;
+      font-family: inherit;
+
+      &::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        filter: invert(0.3); // Làm icon lịch mặc định tiệp màu text
+      }
+    }
+
+    &:focus-within {
+      border-color: #4f46e5; // Hiệu ứng focus đồng bộ
+    }
+  }
+
+  // Khối hỗ trợ trên màn hình nhỏ di động
+  @media (max-width: 768px) {
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+
+      .header-right-filters {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  }
 
   // Thêm vào trong .dashboard-container
   .recharts-default-legend {
@@ -58,7 +192,7 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     .header-left {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      // align-items: center;
     }
     .dashboard-title {
       font-size: 24px;
@@ -191,7 +325,8 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   // Bottom Content - Phần Bảng và Chi tiết
   .bottom-content {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    // THAY ĐỔI TỶ LỆ: Thu nhỏ bảng bên trái (1.2), mở rộng insight bên phải (1)
+    grid-template-columns: 1.2fr 1fr;
     gap: 20px;
     align-items: start;
 
@@ -200,7 +335,7 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       padding: 24px;
       border-radius: $radius;
       box-shadow: $shadow;
-      height: 450px; // CHIỀU CAO CỐ ĐỊNH (KHỐI CỨNG)
+      height: 450px;
       display: flex;
       flex-direction: column;
     }
@@ -214,7 +349,7 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     // Scroll cho bảng tổng hợp
     .table-wrapper {
       flex: 1;
-      overflow-y: auto; // BẬT SCROLL
+      overflow-y: auto;
       &::-webkit-scrollbar {
         width: 6px;
       }
@@ -228,7 +363,7 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       width: 100%;
       border-collapse: collapse;
       thead {
-        position: sticky; // Giữ header khi cuộn
+        position: sticky;
         top: 0;
         background: white;
         z-index: 10;
@@ -257,157 +392,136 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       }
     }
 
-    // Scroll cho chi tiết ngày
-    .details-list-scroll {
-      flex: 1;
-      overflow-y: auto; // BẬT SCROLL
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 10px;
-      }
-    }
-
-    .details-list {
-      .detail-item-modern {
-        display: flex;
-        gap: 12px;
-        padding: 15px;
-        border-radius: 12px;
-        transition: 0.2s;
-        &:hover {
-          background: #f8fafc;
-        }
-        .status-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          margin-top: 6px;
-          flex-shrink: 0;
-          &.very_positive,
-          &.positive,
-          &.tich-cuc {
-            background: #22c55e;
-          }
-          &.neutral,
-          &.trung-lap {
-            background: #f59e0b;
-          }
-          &.very_negative,
-          &.negative,
-          &.tieu-cuc {
-            background: #ef4444;
-          }
-        }
-        .item-content {
-          font-size: 14px;
-          margin: 0 0 8px 0;
-          line-height: 1.4;
-        }
-        .item-meta {
-          display: flex;
-          gap: 12px;
-          font-size: 12px;
-          color: $text-sub;
-          align-items: center;
-          .emotion-label {
-            padding: 2px 8px;
-            border-radius: 4px;
-            &.very_positive,
-            &.positive,
-            &.tich-cuc {
-              background: #dcfce7;
-              color: #166534;
-            }
-            &.very_negative,
-            &.negative,
-            &.tieu-cuc {
-              background: #fee2e2;
-              color: #991b1b;
-            }
-          }
-        }
-      }
-    }
-
-    // Thay thế hoặc bổ sung vào file SCSS của bạn
+    // Phần Insight Phân Tích nâng cấp
     .insight-card {
       .insights-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        padding-right: 4px; // Chừa chỗ cho scrollbar
+        gap: 14px;
+        padding-right: 4px;
 
         .insight-item-modern {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: 16px;
           padding: 16px;
           border-radius: 12px;
-          border-left: 5px solid #cbd5e1;
-          transition:
-            transform 0.2s,
-            box-shadow 0.2s;
+          border-left: 4px solid #cbd5e1; // Mặc định
           background: #f8fafc;
+          transition: all 0.2s ease-in-out;
 
           &:hover {
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
           }
 
+          // Khối chứa icon (Màu nền trắng cố định)
           .insight-icon {
-            font-size: 24px;
+            font-size: 18px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             background: white;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
           }
+
+          // GÁN CỨNG MÀU SẮC THEO ICON GROUP (Không đổi theo Type nữa)
+          .icon-performance {
+            color: #3b82f6;
+          } // Xanh dương năng động
+          .icon-customer {
+            color: #ec4899;
+          } // Hồng/Cam thân thiện
+          .icon-staff {
+            color: #8b5cf6;
+          } // Tím quản trị chuyên nghiệp
+          .icon-risk {
+            color: #f97316;
+          } // Cam hổ phách cảnh báo rủi ro
+          .icon-default {
+            color: #64748b;
+          } // Xám đen mặc định
 
           .insight-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .insight-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 10px;
+
+              .insight-title {
+                font-weight: 600;
+                font-size: 14px;
+                color: $text-main;
+              }
+
+              .insight-metric-tag {
+                font-size: 11px;
+                font-weight: 600;
+                padding: 2px 8px;
+                border-radius: 20px;
+              }
+            }
+
             .insight-message {
               margin: 0;
-              font-size: 14px;
-              font-weight: 500;
+              font-size: 13px;
               line-height: 1.5;
-              color: $text-main;
+              color: #475569;
             }
-          }
 
-          .insight-icon {
-            font-size: 20px; // Chỉnh lại size cho icon bootstrap
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            // Đổ màu trực tiếp cho icon dựa theo class của cha
-            i {
+            .insight-action-box {
               display: flex;
+              align-items: flex-start;
+              gap: 8px;
+              margin-top: 4px;
+              padding: 8px 12px;
+              background: rgba(255, 255, 255, 0.65);
+              border-radius: 8px;
+              font-size: 12px;
+              color: #475569;
+              line-height: 1.4;
+
+              i {
+                color: #eab308;
+                font-size: 13px;
+                margin-top: 1px;
+              }
             }
           }
 
-          // Gán màu cho Icon dựa theo loại insight
+          // CHỈ THAY ĐỔI VIỀN (BORDER) VÀ NỀN THEO TYPE CỦA INSIGHT
           &.good {
-            .insight-icon i {
-              color: #22c55e;
+            background: $bg-good;
+            border-left-color: $border-good;
+            .insight-metric-tag {
+              background: #dcfce7;
+              color: #15803d;
             }
           }
-
-          &.danger {
-            .insight-icon i {
-              color: #ef4444;
-            }
-          }
-
           &.warning {
-            .insight-icon i {
-              color: #f59e0b;
+            background: $bg-warning;
+            border-left-color: $border-warning;
+            .insight-metric-tag {
+              background: #fef3c7;
+              color: #b45309;
+            }
+          }
+          &.danger {
+            background: $bg-danger;
+            border-left-color: $border-danger;
+            .insight-metric-tag {
+              background: #fee2e2;
+              color: #b91c1c;
             }
           }
         }
@@ -419,6 +533,13 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         color: $text-sub;
         font-style: italic;
       }
+    }
+  }
+
+  // Responsive giữ nguyên
+  @media (max-width: 1200px) {
+    .bottom-content {
+      grid-template-columns: 1fr;
     }
   }
 }
