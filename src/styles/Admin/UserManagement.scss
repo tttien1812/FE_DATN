@@ -1,292 +1,462 @@
-.admin-page {
+$bg-light: #f8fafc;
+$border-color: #f1f5f9;
+$text-dark: #1e293b;
+$text-muted: #64748b;
+$primary-color: #4f46e5; // Màu tím xanh chủ đạo của nút
+
+.user-management-container {
+  display: flex;
   width: 100%;
-  padding: 24px 32px;
-  background: #f5f6fa;
-}
+  height: 100%;
+  background-color: #f8fafc;
+  gap: 24px;
+  position: relative;
 
-.admin-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 20px;
+  // ==========================================
+  // KHU VỰC BẢNG BÊN TRÁI
+  // ==========================================
+  .main-content-table {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid $border-color;
 
-  i {
-    margin-right: 8px;
-    color: #0d6efd;
+    .page-header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+
+      .title-area {
+        h2 {
+          font-size: 20px;
+          font-weight: 700;
+          color: $text-dark;
+          margin: 0;
+        }
+        .subtitle {
+          font-size: 13px;
+          color: $text-muted;
+          margin: 4px 0 0 0;
+        }
+      }
+
+      .action-search-area {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .search-box-wrapper {
+          position: relative;
+          width: 260px;
+
+          .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            outline: none;
+            &:focus {
+              border-color: $primary-color;
+            }
+          }
+          .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-muted;
+          }
+        }
+
+        .btn-create-user {
+          background-color: $primary-color;
+          color: #ffffff;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-weight: 500;
+          font-size: 13px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          &:hover {
+            opacity: 0.9;
+          }
+        }
+      }
+    }
+
+    // --- ĐỊNH DẠNG CHI TIẾT CỦA BẢNG DỮ LIỆU ---
+    .admin-table-card {
+      width: 100%;
+      overflow-x: auto;
+
+      .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 14px;
+
+        thead {
+          tr {
+            border-bottom: 2px solid #f1f5f9;
+          }
+          th {
+            padding: 14px 16px;
+            font-weight: 600;
+            color: $text-dark;
+            background-color: #f8fafc;
+          }
+        }
+
+        tbody {
+          tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s;
+
+            &:hover {
+              background-color: #f8fafc;
+            }
+          }
+
+          td {
+            padding: 12px 16px;
+            color: #334155;
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+  }
+
+  // ==========================================
+  // KHỐI FORM PANEL CHỈNH SỬA BÊN PHẢI (DRAWERS)
+  // ==========================================
+  .side-form-panel {
+    width: 380px;
+    background: #ffffff;
+    border-left: 1px solid $border-color;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    animation: slideIn 0.2s ease-out;
+
+    .panel-header {
+      padding: 20px;
+      border-bottom: 1px solid $border-color;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: $text-dark;
+        margin: 0;
+      }
+      .btn-close-panel {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $text-muted;
+        font-size: 16px;
+        &:hover {
+          color: red;
+        }
+      }
+    }
+
+    .panel-body {
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .form-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        label {
+          font-size: 13px;
+          font-weight: 600;
+          color: $text-dark;
+        }
+
+        .panel-input,
+        .panel-select {
+          width: 100%;
+          padding: 10px 12px;
+          border-radius: 8px;
+          border: 1px solid #e2e8f0;
+          font-size: 14px;
+          background-color: #fff;
+          outline: none;
+          &:disabled {
+            background-color: #f8fafc;
+            color: #94a3b8;
+          }
+          &:focus {
+            border-color: $primary-color;
+          }
+        }
+      }
+
+      .avatar-upload-group {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .panel-avatar-preview {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          overflow: hidden;
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          .avatar-empty-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-size: 24px;
+            color: #94a3b8;
+          }
+        }
+
+        .upload-action-btn {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+
+          .btn-trigger-upload {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            color: $primary-color;
+            &:hover {
+              background: #f8fafc;
+            }
+          }
+          .upload-hint-text {
+            font-size: 11px;
+            color: #94a3b8;
+            margin: 0;
+          }
+        }
+      }
+    }
+
+    .panel-footer {
+      padding: 20px;
+      border-top: 1px solid $border-color;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+
+      .btn-panel-cancel {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        &:hover {
+          background: #f8fafc;
+        }
+      }
+
+      .btn-panel-submit {
+        background: $primary-color;
+        border: none;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        &:hover {
+          opacity: 0.9;
+        }
+      }
+    }
   }
 }
 
-.admin-form-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 24px;
-}
+// ==========================================
+// ĐỊNH DẠNG THÀNH PHẦN CON TRONG BẢNG (BADGES & AVATARS)
+// ==========================================
 
-.admin-form-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-.admin-input,
-.admin-select {
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #333;
-}
-
-.admin-form-actions {
-  margin-top: 16px;
-  display: flex;
-  gap: 12px;
-}
-
-.admin-table-card {
-  background: #fff;
-  padding: 16px;
-  border-radius: 10px;
-}
-
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-
-  th {
-    background: #f1f3f5;
-    text-align: left;
-    padding: 12px;
-    font-size: 14px;
-  }
-
-  td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-    color: #333;
-  }
-}
-
-.btn {
-  margin: 8px;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-
-  &.btn-create {
-    background: #2563eb;
-    color: #fff;
-  }
-
-  &.btn-update {
-    background: #16a34a;
-    color: #fff;
-  }
-
-  &.btn-reset {
-    background: #e5e7eb;
-  }
-}
-
-.role-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-
-  &.admin {
-    background: #ffe3e3;
-    color: #c92a2a;
-  }
-
-  &.user {
-    background: #e7f5ff;
-    color: #1c7ed6;
-  }
-}
-
-.status-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-
-  &.active {
-    background: #d3f9d8;
-    color: #2b8a3e;
-  }
-
-  &.inactive {
-    background: #ffe3e3;
-    color: #c92a2a;
-  }
-}
-
-.admin-actions {
-  display: flex;
-  gap: 12px;
-  font-size: 18px;
-
-  .action-edit {
-    color: #0d6efd;
-    cursor: pointer;
-  }
-
-  .action-delete {
-    color: #fa5252;
-    cursor: pointer;
-  }
-}
-
-/* =========================
-   MODAL OVERLAY
-========================= */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
+// Khung chứa hình ảnh Avatar trong hàng dữ liệu
+.table-avatar-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-  animation: fadeIn 0.25s ease;
-}
+  background-color: #f1f5f9;
 
-/* =========================
-   MODAL CARD
-========================= */
-.modal-card {
-  width: 520px;
-  max-width: calc(100% - 32px);
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-  animation: slideUp 0.3s ease;
-}
-
-/* =========================
-   MODAL TITLE
-========================= */
-.modal-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #1f2937;
-  text-align: center;
-}
-
-/* =========================
-   FORM GRID (reuse admin)
-========================= */
-.modal-card {
-  .admin-form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    margin-bottom: 24px;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  .admin-input,
-  .admin-select {
-    height: 44px;
-    border-radius: 10px;
-    padding: 0 14px;
-    border: 1px solid #e5e7eb;
+  .avatar-placeholder {
+    font-weight: 600;
+    color: $text-muted;
     font-size: 14px;
-    outline: none;
-    background: #f9fafb;
-    transition: all 0.2s ease;
+  }
+}
 
-    &:focus {
-      border-color: #3b82f6;
-      background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+// Định dạng chung cho thẻ Badge
+.role-badge,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+// Badge chức vụ (Tiệp chuẩn màu sắc theo hình vẽ)
+.role-badge {
+  &.admin {
+    background-color: #ffebee;
+    color: #ef5350;
+  }
+  &.user {
+    background-color: #e8eaf6;
+    color: #5c6bc0;
+  }
+}
+
+// Badge trạng thái hoạt động
+.status-badge {
+  &.active {
+    background-color: #e8f5e9;
+    color: #4caf50;
+  }
+  &.inactive {
+    background-color: #eceff1;
+    color: #78909c;
+  }
+}
+
+// Nút tương tác sửa / xóa dữ liệu
+.admin-actions {
+  display: flex;
+  gap: 16px;
+  font-size: 18px;
+  align-items: center;
+  height: 40px; // Thăng bằng chiều cao theo hàng
+
+  i {
+    cursor: pointer;
+    transition:
+      transform 0.1s,
+      color 0.1s;
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+
+  .action-edit {
+    color: #4f46e5;
+    &:hover {
+      color: #312e81;
+    }
+  }
+
+  .action-delete {
+    color: #ef4444;
+    &:hover {
+      color: #991b1b;
     }
   }
 }
 
-/* =========================
-   MODAL ACTIONS
-========================= */
-.modal-card {
-  .admin-form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
+// Thanh phân trang dưới đáy table
+.table-pagination-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid $border-color;
 
-    .btn {
-      min-width: 100px;
-      height: 42px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 500;
+  .pagination-text {
+    font-size: 13px;
+    color: $text-muted;
+  }
+
+  .pagination-controls {
+    display: flex;
+    gap: 6px;
+
+    .page-btn {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-primary {
-      background: #2563eb;
-      color: #fff;
-      border: none;
+      font-size: 13px;
+      color: $text-dark;
+      transition: all 0.2s;
 
       &:hover {
-        background: #1d4ed8;
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
       }
-    }
 
-    .btn-secondary {
-      background: #f3f4f6;
-      color: #374151;
-      border: none;
-
-      &:hover {
-        background: #e5e7eb;
+      &.active {
+        border-color: $primary-color;
+        color: $primary-color;
+        background-color: #f5f3ff;
+        font-weight: 600;
       }
     }
   }
 }
 
-/* =========================
-   ANIMATIONS
-========================= */
-@keyframes fadeIn {
+@keyframes slideIn {
   from {
+    transform: translateX(50px);
     opacity: 0;
   }
   to {
+    transform: translateX(0);
     opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(30px) scale(0.96);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-@media (max-width: 640px) {
-  .modal-card {
-    padding: 20px;
-
-    .admin-form-grid {
-      grid-template-columns: 1fr;
-    }
   }
 }

@@ -1,0 +1,791 @@
+@use "sass:color";
+
+$primary: #3861fb;
+$primary-hover: #264be3;
+$bg-main: #f4f6fa;
+$bg-surface: #ffffff;
+$text-title: #1e293b;
+$text-paragraph: #475569;
+$text-light: #94a3b8;
+$border: #e2e8f0;
+
+$pos-color: #059669;
+$pos-bg: #ecfdf5;
+$neg-color: #dc2626;
+$neg-bg: #fef2f2;
+$neu-color: #4b5563;
+$neu-bg: #f3f4f6;
+
+.admin-dashboard-layout {
+  display: flex;
+  background-color: $bg-main;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  color: $text-paragraph;
+  position: relative;
+
+  // --- MÀN HÌNH CHÍNH / BẢNG DANH SÁCH GIỮ NGUYÊN VỊ TRÍ ---
+  .master-workspace {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+    overflow-y: auto;
+
+    .workspace-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      .title-block {
+        h2 {
+          font-size: 22px;
+          margin: 0;
+          color: $text-title;
+        }
+        .count-badge {
+          font-size: 12px;
+          color: $text-light;
+          background: #e2e8f0;
+          padding: 2px 8px;
+          border-radius: 20px;
+        }
+      }
+      .btn-secondary-filter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        border: 1px solid $border;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }
+
+    .table-container-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid $border;
+      overflow-x: auto;
+      position: relative;
+      .business-table {
+        width: 100%;
+        border-collapse: collapse;
+        th {
+          background: #f8fafc;
+          padding: 14px 16px;
+          font-size: 13px;
+          color: $text-paragraph;
+          border-bottom: 1px solid $border;
+        }
+        tr {
+          border-bottom: 1px solid $border;
+          cursor: pointer;
+          &:hover {
+            background: #f8fafc;
+          }
+          &.selected-row {
+            background-color: rgba($primary, 0.05);
+          }
+        }
+        td {
+          padding: 14px 16px;
+          font-size: 14px;
+        }
+        .col-id {
+          font-family: monospace;
+          color: $text-light;
+        }
+        .identity-cell {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          .cell-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+          }
+          .cell-avatar-placeholder {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+          }
+        }
+        .score-indicator {
+          font-weight: 700;
+          &.positive {
+            color: $pos-color;
+          }
+          &.negative {
+            color: $neg-color;
+          }
+        }
+        .status-pill {
+          display: inline-block;
+          padding: 2px 8px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          &.tone-positive {
+            background: $pos-bg;
+            color: $pos-color;
+          }
+          &.tone-negative {
+            background: $neg-bg;
+            color: $neg-color;
+          }
+          &.tone-neutral {
+            background: $neu-bg;
+            color: $neu-color;
+          }
+        }
+      }
+    }
+    .workspace-pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      .pagination-buttons {
+        display: flex;
+        gap: 4px;
+        button {
+          min-width: 32px;
+          height: 32px;
+          border: 1px solid $border;
+          background: white;
+          border-radius: 6px;
+          &.active-page {
+            background: $primary;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+
+  // ==========================================
+  // --- KHỐI CHI TIẾT CONVERSATION Ở GIỮA ---
+  // ==========================================
+  .center-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+
+    .center-modal-box {
+      background: $bg-surface;
+      width: 100%;
+      max-width: 1100px;
+      height: 85vh;
+      min-height: 550px;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      overflow: hidden;
+      animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+      @media (max-width: 992px) {
+        flex-direction: column;
+        height: 95vh; // Màn hình nhỏ chuyển thành layout đứng dọc
+      }
+
+      .modal-loading-state {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        color: $text-light;
+      }
+
+      // --- CỘT TRÁI CHÍNH: CHỨA AUDIO VÀ TRANSCRIPT (CHIẾM PHẦN LỚN DIỆN TÍCH) ---
+      .modal-main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-right: 1px solid $border;
+        overflow: hidden;
+
+        .modal-inner-header {
+          padding: 18px 24px;
+          border-bottom: 1px solid $border;
+          background: #fafafa;
+          .user-profile-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            .profile-circle {
+              width: 36px;
+              height: 36px;
+              background: $primary;
+              color: white;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 700;
+            }
+            h3 {
+              margin: 0;
+              font-size: 16px;
+              color: $text-title;
+              font-weight: 700;
+            }
+            p {
+              margin: 2px 0 0;
+              font-size: 12px;
+              color: $text-light;
+            }
+          }
+        }
+
+        .modal-inner-body {
+          flex: 1;
+          overflow-y: auto;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+
+          // TRÌNH PHÁT NHẠC AUDIO ĐEN SANG TRỌNG
+          .biz-audio-deck {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            .wavesurfer-target {
+              min-height: 45px;
+              margin-bottom: 8px;
+            }
+            .audio-meta-row {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .timer-badge {
+                font-family: monospace;
+                font-size: 12.5px;
+                color: #94a3b8;
+                .sl {
+                  color: #475569;
+                }
+              }
+              .controls-group {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                .btn-skip {
+                  background: none;
+                  border: none;
+                  color: #94a3b8;
+                  font-size: 16px;
+                  cursor: pointer;
+                  &:hover {
+                    color: white;
+                  }
+                }
+                .btn-master-play {
+                  width: 36px;
+                  height: 36px;
+                  background: $primary;
+                  border: none;
+                  color: white;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 16px;
+                  cursor: pointer;
+                  &:hover {
+                    background: $primary-hover;
+                  }
+                }
+              }
+              .audio-addons {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                .btn-rate {
+                  background: #1e293b;
+                  border: none;
+                  color: white;
+                  padding: 3px 6px;
+                  border-radius: 4px;
+                  font-size: 11px;
+                  cursor: pointer;
+                }
+                .vol-slider {
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 14px;
+                  color: #94a3b8;
+                  input {
+                    width: 45px;
+                    accent-color: $primary;
+                  }
+                }
+              }
+            }
+          }
+
+          .speakers-analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            .speaker-tag-card {
+              padding: 10px 14px;
+              border-radius: 8px;
+              border: 1px solid $border;
+              background: #f8fafc;
+              display: flex;
+              flex-direction: column;
+              gap: 2px;
+              .role-lbl {
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                margin-bottom: 4px;
+                display: inline-block;
+              }
+              .meta-txt {
+                font-size: 12px;
+                display: flex;
+                justify-content: space-between;
+                strong {
+                  font-weight: 600;
+                }
+                .s-positive {
+                  color: $pos-color;
+                }
+                .s-negative {
+                  color: $neg-color;
+                }
+              }
+              &.role-agent {
+                border-top: 3px solid $pos-color;
+                .role-lbl {
+                  color: $pos-color;
+                }
+              }
+              &.role-customer {
+                border-top: 3px solid $primary;
+                .role-lbl {
+                  color: $primary;
+                }
+              }
+            }
+          }
+
+          .transcript-flow-section {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 250px;
+            h4 {
+              font-size: 13.5px;
+              color: $text-title;
+              margin: 0 0 10px 0;
+              font-weight: 700;
+            }
+            .transcript-scroll-area {
+              flex: 1;
+              overflow-y: auto;
+              padding-right: 4px;
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              max-height: 320px;
+              &::-webkit-scrollbar {
+                width: 4px;
+              }
+              &::-webkit-scrollbar-thumb {
+                background: #cbd5e0;
+                border-radius: 4px;
+              }
+
+              .transcript-bubble {
+                padding: 10px 14px;
+                border-radius: 8px;
+                background: #fff;
+                border: 1px solid #f1f5f9;
+                border-left: 3px solid transparent;
+                cursor: pointer;
+                transition: all 0.2s;
+                .bubble-header {
+                  display: flex;
+                  gap: 8px;
+                  font-size: 11px;
+                  margin-bottom: 2px;
+                  .name {
+                    font-weight: 700;
+                  }
+                  .time {
+                    color: $text-light;
+                  }
+                }
+                .text {
+                  margin: 0;
+                  font-size: 13px;
+                  color: $text-title;
+                  line-height: 1.4;
+                }
+
+                &.speaker-agent {
+                  border-left-color: $pos-color;
+                  &:hover {
+                    background: #fafdfc;
+                  }
+                }
+                &.speaker-customer {
+                  border-left-color: $primary;
+                  &:hover {
+                    background: #fbfbfe;
+                  }
+                }
+                &.bubble-current-playing {
+                  border-color: $primary;
+                  border-left-width: 4px;
+                  box-shadow: 0 3px 10px rgba($primary, 0.08);
+                  background: #f8fafc;
+                }
+                &.bubble-insight-highlighted {
+                  background: #fffbeb;
+                  border-color: #fcd34d;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // --- CỘT PHẢI PHỤ: DẠNG NOTIFICATION / TIMELINE BÊN LỀ (CHỨA INSIGHTS) ---
+      .modal-side-notifications {
+        width: 320px;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        @media (max-width: 992px) {
+          width: 100%;
+          height: auto;
+          max-height: 40%;
+          border-top: 1px solid $border; // Responsive dọc
+        }
+
+        .side-header {
+          padding: 18px 20px;
+          border-bottom: 1px solid $border;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: white;
+          span {
+            font-size: 13px;
+            font-weight: 700;
+            color: $text-title;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
+          .btn-close-modal {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: $text-light;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            &:hover {
+              color: $text-title;
+            }
+          }
+        }
+
+        .side-body-widgets {
+          padding: 16px;
+          flex: 1;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+
+          .widget-score-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            .score-tile {
+              background: white;
+              border: 1px solid $border;
+              padding: 10px;
+              border-radius: 6px;
+              text-align: center;
+              label {
+                font-size: 10px;
+                text-transform: uppercase;
+                color: $text-light;
+                display: block;
+                font-weight: 500;
+              }
+              var {
+                font-style: normal;
+                font-size: 16px;
+                font-weight: 800;
+                color: $text-title;
+                margin-top: 2px;
+                display: block;
+              }
+            }
+          }
+
+          .widget-insights-notification-stack {
+            h5 {
+              margin: 0 0 10px 0;
+              font-size: 12.5px;
+              text-transform: uppercase;
+              color: $text-paragraph;
+              font-weight: 700;
+              letter-spacing: 0.3px;
+            }
+            .notification-list {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+
+              // CÁC THẺ NOTIFICATION INSIGHT CHẠY DỌC BÊN CẠNH
+              .insight-notify-card {
+                padding: 12px;
+                border-radius: 8px;
+                background: white;
+                border: 1px solid $border;
+                border-right: 3px solid transparent;
+                cursor: pointer;
+                transition: all 0.15s;
+                .notify-top {
+                  display: flex;
+                  justify-content: space-between;
+                  font-weight: 600;
+                  font-size: 12px;
+                  margin-bottom: 2px;
+                  .lbl {
+                    color: $text-title;
+                  }
+                }
+                .msg {
+                  margin: 0;
+                  font-size: 11.5px;
+                  color: $text-paragraph;
+                  line-height: 1.3;
+                }
+                .anchor-hint {
+                  display: block;
+                  margin-top: 6px;
+                  font-size: 10px;
+                  font-weight: 500;
+                  color: $primary;
+                }
+
+                &.type-danger {
+                  border-right-color: $neg-color;
+                  background: #fffdfd;
+                  &:hover {
+                    background: #fef2f2;
+                  }
+                }
+                &.type-warning {
+                  border-right-color: #d97706;
+                  background: #fffdfa;
+                  &:hover {
+                    background: #fffbeb;
+                  }
+                }
+                &.type-info {
+                  border-right-color: $primary;
+                  background: #fafbfe;
+                  &:hover {
+                    background: #eff6ff;
+                  }
+                }
+                &.is-focused {
+                  border-color: $primary;
+                  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+                }
+              }
+            }
+            .notification-empty {
+              font-size: 12px;
+              color: $text-light;
+              text-align: center;
+              padding: 20px;
+              background: white;
+              border: 1px dashed $border;
+              border-radius: 8px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // --- DRAWER BỘ LỌC NÂNG CAO ---
+  .filter-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    &.show {
+      opacity: 1;
+      pointer-events: auto;
+      .filter-drawer-content {
+        transform: translateX(0);
+      }
+    }
+    .filter-drawer-content {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 320px;
+      background: white;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.25s ease-out;
+      .drawer-header {
+        padding: 16px;
+        border-bottom: 1px solid $border;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        h3 {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 700;
+        }
+        .btn-close-drawer {
+          background: none;
+          border: none;
+          font-size: 18px;
+          cursor: pointer;
+          color: $text-light;
+        }
+      }
+      .drawer-body {
+        padding: 16px;
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        .form-item {
+          label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+          }
+          input,
+          select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid $border;
+            border-radius: 6px;
+            font-size: 13px;
+          }
+          .sentiment-chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            .filter-chip {
+              padding: 4px 8px;
+              border-radius: 4px;
+              border: 1px solid $border;
+              background: white;
+              font-size: 11px;
+              cursor: pointer;
+              &.active {
+                background: $primary;
+                color: white;
+              }
+            }
+          }
+          .input-with-icon {
+            position: relative;
+            svg {
+              position: absolute;
+              left: 8px;
+              top: 10px;
+              color: $text-light;
+            }
+            input {
+              padding-left: 28px;
+            }
+          }
+        }
+      }
+      .drawer-footer {
+        padding: 12px 16px;
+        border-top: 1px solid $border;
+        display: flex;
+        gap: 8px;
+        background: #f8fafc;
+        button {
+          flex: 1;
+          padding: 8px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          &.btn-reset-drawer {
+            background: white;
+            border-color: $border;
+          }
+          &.btn-apply-drawer {
+            background: $primary;
+            color: white;
+            border: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Keyframes
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scaleIn {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

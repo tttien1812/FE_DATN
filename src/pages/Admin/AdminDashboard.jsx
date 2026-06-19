@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FaUserCircle } from "react-icons/fa";
 import {
   LineChart,
   Line,
@@ -12,6 +13,7 @@ import {
 import {
   getAdminDashboardApi,
   getAdminUserDetailApi,
+  getAdminInsightApi,
 } from "../../services/dashboardService";
 import "../../styles/Admin/AdminDashboard.scss";
 
@@ -20,6 +22,7 @@ function AdminDashboardPage() {
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetail, setUserDetail] = useState(null);
+  const [insights, setInsights] = useState([]);
 
   const [sortBy, setSortBy] = useState("totalConversations");
   const [order, setOrder] = useState("DESC");
@@ -37,11 +40,34 @@ function AdminDashboardPage() {
     }
   }, [month, selectedUser]);
 
+  // const fetchData = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const res = await getAdminDashboardApi({ sortBy, order, month });
+  //     if (res.data.errCode === 0) setData(res.data.data);
+  //   } catch (e) {
+  //     console.error(e);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await getAdminDashboardApi({ sortBy, order, month });
-      if (res.data.errCode === 0) setData(res.data.data);
+
+      const [dashboardRes, insightRes] = await Promise.all([
+        getAdminDashboardApi({ sortBy, order, month }),
+        getAdminInsightApi(month),
+      ]);
+
+      if (dashboardRes.data.errCode === 0) {
+        setData(dashboardRes.data.data);
+      }
+
+      if (insightRes.data.errCode === 0) {
+        setInsights(insightRes.data.data);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -68,6 +94,72 @@ function AdminDashboardPage() {
 
   if (!data)
     return <div className="loading-container">Đang tải dữ liệu...</div>;
+
+  const getInsightByGroup = (group) => {
+    return insights.find((item) => item.group === group);
+  };
+
+  const performanceInsight = getInsightByGroup("performance");
+  const sentimentInsight = getInsightByGroup("customer");
+  const staffInsight = getInsightByGroup("staff");
+  const issueInsight = getInsightByGroup("risk");
+  const reliabilityInsight = getInsightByGroup("reliability");
+
+  const recommendationItems = [
+    performanceInsight,
+    sentimentInsight,
+    staffInsight,
+    issueInsight,
+    reliabilityInsight,
+  ].filter(Boolean);
+
+  const getScoreLabel = (score) => {
+    const value = Number(score || 0);
+
+    if (value >= 0.8) return "Xuất sắc";
+    if (value >= 0.65) return "Tốt";
+    if (value >= 0.5) return "Trung bình";
+    if (value >= 0.4) return "Cần cải thiện";
+    return "Rủi ro cao";
+  };
+
+  const getScoreClass = (score) => {
+    const value = Number(score || 0);
+
+    if (value >= 0.65) return "good";
+    if (value >= 0.5) return "warning";
+    return "danger";
+  };
+
+  const getRoleLabel = (role) => {
+    if (role === "customer") return "Trải nghiệm khách hàng";
+    if (role === "staff") return "Chất lượng xử lý của nhân viên";
+    return "Vai trò chưa xác định";
+  };
+
+  const getRoleDescription = (role) => {
+    if (role === "customer") {
+      return "Phản ánh mức độ tích cực trong phản hồi của khách hàng.";
+    }
+
+    if (role === "staff") {
+      return "Phản ánh cách nhân viên tư vấn và xử lý tình huống.";
+    }
+
+    return "Dữ liệu đang được hệ thống tổng hợp.";
+  };
+
+  const getInitials = (fullName = "") => {
+    const parts = fullName.trim().split(" ");
+
+    if (parts.length === 1) {
+      return parts[0].charAt(0).toUpperCase();
+    }
+
+    return (
+      parts[parts.length - 2].charAt(0) + parts[parts.length - 1].charAt(0)
+    ).toUpperCase();
+  };
 
   return (
     <div className="admin-dashboard-container">
@@ -158,14 +250,17 @@ function AdminDashboardPage() {
                   >
                     <td>{i + 1}</td>
                     <td className="user-cell">
-                      <img
-                        src={
-                          u.image
-                            ? `${UPLOAD_URL}/${u.image}`
-                            : "/default-avatar.png"
-                        }
-                        alt=""
-                      />
+                      {u.image ? (
+                        <img
+                          src={`${UPLOAD_URL}/${u.image}`}
+                          alt={u.fullName}
+                        />
+                      ) : (
+                        <div className="avatar-placeholder">
+                          {getInitials(u.fullName)}
+                        </div>
+                      )}
+
                       <span>{u.fullName}</span>
                     </td>
                     <td>
@@ -197,18 +292,26 @@ function AdminDashboardPage() {
           ) : (
             <div className="user-detail-content">
               <div className="profile-header">
-                <img
-                  src={
-                    userDetail.user.image
-                      ? `${UPLOAD_URL}/${userDetail.user.image}`
-                      : ""
-                  }
-                  alt=""
-                  className="avatar-large"
-                />
+                {userDetail.user.image ? (
+                  <img
+                    src={`${UPLOAD_URL}/${userDetail.user.image}`}
+                    alt={userDetail.user.fullName}
+                    className="avatar-large"
+                  />
+                ) : (
+                  <div className="avatar-large-placeholder">
+                    {getInitials(userDetail.user.fullName)}
+                  </div>
+                )}
                 <div className="meta">
                   <h4>{userDetail.user.fullName}</h4>
                   <p>{userDetail.user.email}</p>
+
+                  <span
+                    className={`performance-badge ${getScoreClass(userDetail.kpi.avgScore)}`}
+                  >
+                    {getScoreLabel(userDetail.kpi.avgScore)}
+                  </span>
                 </div>
               </div>
 
@@ -279,27 +382,50 @@ function AdminDashboardPage() {
 
               {/* BẢNG SPEAKER PHÂN TÍCH */}
               <div className="speaker-analysis">
-                <h5>Điểm cảm xúc theo vai trò</h5>
-                <table className="speaker-table">
-                  <thead>
-                    <tr>
-                      <th>Vai trò</th>
-                      <th>Điểm</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {userDetail.speaker.map((s, i) => (
-                      <tr key={i}>
-                        <td>{s.role}</td>
-                        <td>
-                          <span className="score-tag">
-                            {s.avgScore.toFixed(2)}
+                <h5>Phân tích hiệu suất theo góc nhìn</h5>
+
+                <div className="role-score-list">
+                  {userDetail.speaker.map((s, i) => {
+                    const score = Number(s.avgScore || 0);
+                    const percent = Math.max(0, Math.min(100, score * 100));
+
+                    return (
+                      <div className="role-score-item" key={i}>
+                        <div className="role-score-header">
+                          <div>
+                            <strong>{getRoleLabel(s.role)}</strong>
+                            <p>{getRoleDescription(s.role)}</p>
+                          </div>
+
+                          <span className={`score-tag ${getScoreClass(score)}`}>
+                            {score.toFixed(2)}
                           </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+
+                        <div className="progress-track">
+                          <div
+                            className={`progress-fill ${getScoreClass(score)}`}
+                            style={{ width: `${percent}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="employee-summary-note">
+                  {userDetail.comparison.scoreDiff >= 0 ? (
+                    <span className="up">
+                      Nhân viên này đang cao hơn trung bình hệ thống{" "}
+                      {Math.abs(userDetail.comparison.scoreDiff)} điểm.
+                    </span>
+                  ) : (
+                    <span className="down">
+                      Nhân viên này đang thấp hơn trung bình hệ thống{" "}
+                      {Math.abs(userDetail.comparison.scoreDiff)} điểm.
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -309,50 +435,146 @@ function AdminDashboardPage() {
         <div className="right-column-grid">
           <section className="section-sentiment">
             <div className="card-header">
-              <h3>PHÂN TÍCH CẢM XÚC</h3>
+              <h3>SỨC KHỎE TRẢI NGHIỆM</h3>
             </div>
+
             <div className="sentiment-stats">
               <div className="stat-item neg">
-                <h2>21.7%</h2>
-                <p>Negative</p>
+                <h2>{(data.totalSystem.negativeRate * 100).toFixed(1)}%</h2>
+                <p>Tỷ lệ tiêu cực</p>
               </div>
+
               <div className="stat-item pos">
-                <h2>52.3%</h2>
-                <p>Positive</p>
+                <h2>
+                  {(
+                    Math.max(0, 1 - data.totalSystem.negativeRate) * 100
+                  ).toFixed(1)}
+                  %
+                </h2>
+                <p>Tỷ lệ ổn định</p>
               </div>
             </div>
+
+            {sentimentInsight && (
+              <div className={`issue-item ${sentimentInsight.type}`}>
+                <span>Đánh giá khách hàng</span>
+                <strong>{sentimentInsight.metric}</strong>
+              </div>
+            )}
           </section>
 
           <section className="section-issues">
             <div className="card-header">
-              <h3>TOP VẤN ĐỀ</h3>
+              <h3>CẢNH BÁO CẦN XỬ LÝ</h3>
             </div>
+
             <div className="issue-list">
               <div className="issue-item">
                 <span>Cuộc gọi tiêu cực</span>
-                <strong>30%</strong>
+                <strong>
+                  {data.totalSystem.totalNegative} /{" "}
+                  {data.totalSystem.totalAudio}
+                </strong>
               </div>
-              <div className="issue-item">
-                <span>User điểm thấp</span>
-                <strong>3</strong>
-              </div>
+
+              {sentimentInsight && (
+                <div className={`issue-item ${sentimentInsight.type}`}>
+                  <span>Trải nghiệm khách hàng</span>
+                  <strong>{sentimentInsight.metric}</strong>
+                </div>
+              )}
+
+              {staffInsight && (
+                <div className={`issue-item ${staffInsight.type}`}>
+                  <span>Nhân viên cần theo dõi</span>
+                  <strong>{staffInsight.metric}</strong>
+                </div>
+              )}
             </div>
           </section>
 
-          <section className="section-drilldown">
+          {/* <section className="section-drilldown">
             <div className="card-header">
-              <h3>DRILL DOWN</h3>
+              <h3>HÀNH ĐỘNG GỢI Ý</h3>
             </div>
+
             <div className="drill-actions">
               <button>
-                <i className="bi bi-person-badge"></i> Dashboard nhân viên
+                <i className="bi bi-person-badge"></i>{" "}
+                {staffInsight?.action ||
+                  "Kiểm tra nhân viên có điểm xử lý thấp"}
               </button>
+
               <button>
-                <i className="bi bi-chat-dots"></i> Dashboard khách hàng
+                <i className="bi bi-chat-dots"></i>{" "}
+                {sentimentInsight?.action ||
+                  "Xem lại các cuộc gọi khách hàng chưa hài lòng"}
               </button>
             </div>
-          </section>
+          </section> */}
         </div>
+      </div>
+
+      <div className="dashboard-footer">
+        <section className="section-drilldown-modern">
+          <div className="card-header-modern">
+            <div className="title-area">
+              <i className="bi bi-lightbulb-fill text-warning"></i>
+              <h3>PHÂN TÍCH & KHUYẾN NGHỊ CHIẾN LƯỢC</h3>
+            </div>
+            <span className="badge-count">
+              Phát hiện {recommendationItems.length} vấn đề
+            </span>
+          </div>
+
+          <div className="drill-actions-wrapper">
+            {recommendationItems.length === 0 ? (
+              <div className="empty-recommendation">
+                <i className="bi bi-shield-check"></i>
+                <p>Hệ thống chưa phát hiện vấn đề nổi bật trong tháng này.</p>
+                <span>
+                  Tiếp tục duy trì và theo dõi định kỳ dashboard hệ thống.
+                </span>
+              </div>
+            ) : (
+              <div className="recommendation-table-wrapper">
+                <table className="recommendation-table">
+                  <thead>
+                    <tr>
+                      <th width="12%">Mức độ</th>
+                      <th width="38%">Nguyên nhân phát hiện từ hệ thống</th>
+                      <th width="38%">Hành động & Giải pháp khuyến nghị</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recommendationItems.map((item, index) => (
+                      <tr key={index} className={`rec-row ${item.type}`}>
+                        <td>
+                          {/* item.type nhận vào: 'danger', 'warning', 'good' hoặc 'info' */}
+                          <span className={`status-badge ${item.type}`}>
+                            {item.type === "danger" && "Nghiêm trọng"}
+                            {item.type === "warning" && "Cần chú ý"}
+                            {item.type === "good" && "Tích cực"}
+                            {item.type === "info" && "Thông tin"}
+                          </span>
+                        </td>
+                        <td className="message-cell">
+                          <p>{item.message}</p>
+                        </td>
+                        <td className="action-cell">
+                          <div className="action-box-inner">
+                            <i className="bi bi-arrow-right-short text-primary"></i>
+                            <span>{item.action}</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

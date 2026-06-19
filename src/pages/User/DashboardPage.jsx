@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getDashboardDailyApi,
   getMonthlyKpiApi,
-  getInsightApi,
+  getUserInsightApi,
 } from "../../services/dashboardService";
 
 import {
@@ -46,7 +46,7 @@ function DashboardPage() {
       const [dailyRes, kpiRes, insightRes] = await Promise.all([
         getDashboardDailyApi(userId, month),
         getMonthlyKpiApi(userId, month),
-        getInsightApi(userId, month),
+        getUserInsightApi(userId, month),
       ]);
 
       if (dailyRes.data.errCode === 0) setDailyData(dailyRes.data.data);
@@ -112,19 +112,39 @@ function DashboardPage() {
     very_negative: "Rất tiêu cực",
   };
 
-  const renderInsightIcon = (type) => {
-    switch (type) {
-      case "good":
-        return <i className="bi bi-rocket-takeoff-fill"></i>;
-      case "danger":
-        return <i className="bi bi-exclamation-triangle-fill"></i>;
-      case "warning":
-        return <i className="bi bi-lightbulb-fill"></i>;
+  // const renderInsightIcon = (type) => {
+  //   switch (type) {
+  //     case "good":
+  //       return <i className="bi bi-rocket-takeoff-fill"></i>;
+  //     case "danger":
+  //       return <i className="bi bi-exclamation-triangle-fill"></i>;
+  //     case "warning":
+  //       return <i className="bi bi-lightbulb-fill"></i>;
+  //     default:
+  //       return <i className="bi bi-info-circle-fill"></i>;
+  //   }
+  // };
+
+  const renderInsightIcon = (item) => {
+    const group = item?.group;
+
+    switch (group) {
+      case "performance":
+        return <i className="bi bi-speedometer2 icon-performance"></i>;
+
+      case "customer":
+        return <i className="bi bi-emoji-smile-fill icon-customer"></i>;
+
+      case "staff":
+        return <i className="bi bi-person-badge-fill icon-staff"></i>;
+
+      case "risk":
+        return <i className="bi bi-shield-exclamation icon-risk"></i>;
+
       default:
-        return <i className="bi bi-info-circle-fill"></i>;
+        return <i className="bi bi-info-circle-fill icon-default"></i>;
     }
   };
-
   const activeKeys = sentimentKeys.filter((key) =>
     sentimentPercentData.some((item) => item[key] > 0),
   );
@@ -198,6 +218,13 @@ function DashboardPage() {
       <div className="dashboard-header">
         <div className="header-left">
           <h1 className="dashboard-title">Dashboard Tổng Quan</h1>
+          <p className="dashboard-subtitle">
+            Theo dõi xu hướng và phân bổ cảm xúc của khách hàng
+          </p>
+        </div>
+
+        <div className="header-right-filters">
+          {/* Khối nút chọn khoảng ngày (7 ngày, 30 ngày...) */}
           <div className="filter-group">
             {["1", "7", "30"].map((r) => (
               <button
@@ -209,11 +236,17 @@ function DashboardPage() {
               </button>
             ))}
           </div>
-          <div className="filter-row">
+
+          {/* Khối chọn tháng được làm gọn và đẹp lại */}
+          <div className="month-filter-box">
+            <span className="month-label">
+              <i className="bi bi-calendar3"></i> Tháng:
+            </span>
             <input
               type="month"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
+              className="month-input-clean"
             />
           </div>
         </div>
@@ -428,24 +461,44 @@ function DashboardPage() {
           <h3 className="section-title">💡 Insight & Phân tích</h3>
 
           <div className="table-wrapper">
-            {" "}
             {/* Tận dụng table-wrapper để có scroll */}
             <div className="insights-list">
               {!insights.length ? (
                 <div className="empty-state">
-                  Chưa có insight nào được ghi nhận
+                  <i className="bi bi-inbox-fill"></i>{" "}
+                  {/* Thêm icon cho trống trải */}
+                  <p>Chưa có insight nào được ghi nhận</p>
                 </div>
               ) : (
                 insights.map((item, index) => (
                   <div
                     key={index}
-                    className={`insight-item-modern ${item.type}`}
+                    className={`insight-item-modern ${item.type}`} // good, warning, danger
                   >
                     <div className="insight-icon">
-                      {renderInsightIcon(item.type)}
+                      {renderInsightIcon(item)}
                     </div>
+
                     <div className="insight-body">
+                      <div className="insight-header">
+                        <span className="insight-title">{item.title}</span>
+                        {item.metric && (
+                          <span className="insight-metric-tag">
+                            {item.metric}
+                          </span>
+                        )}
+                      </div>
+
                       <p className="insight-message">{item.message}</p>
+
+                      {item.action && (
+                        <div className="insight-action-box">
+                          <i className="bi bi-lightbulb"></i>
+                          <span>
+                            <strong>Gợi ý:</strong> {item.action}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))
